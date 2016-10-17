@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/mitchellh/go-homedir"
-	"github.com/rs/cors"
 )
 
 var ggcDir string
@@ -64,12 +63,7 @@ Options:
 	log.Printf("Accepting connections at http://localhost:%s/", port)
 	log.Printf("Use base directory: %s", ggcDir)
 
-	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"https://github.com"},
-		AllowedMethods: []string{"POST"},
-	})
-
-	http.Handle("/", c.Handler(http.HandlerFunc(gitClone)))
+	http.HandleFunc("/", gitClone)
 	http.ListenAndServe(":"+port, nil)
 }
 
