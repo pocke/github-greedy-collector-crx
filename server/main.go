@@ -9,6 +9,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/mitchellh/go-homedir"
 )
 
 var ggcDir string
@@ -16,10 +18,11 @@ var port string
 
 func ggcDirDefault() string {
 	dir := "ggc"
-	b, err := exec.Command("git", "config", "ghq.root").CombinedOutput()
+	b, err := exec.Command("git", "config", "--get-all", "ghq.root").CombinedOutput()
 	if err == nil {
 		if dirs := strings.Split(string(b), "\n"); len(dirs) > 0 {
-			dir = strings.TrimSpace(dirs[0])
+			d, _ := homedir.Expand(dirs[0])
+			dir = d
 		}
 	}
 	return dir
@@ -89,5 +92,6 @@ func gitClone(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Repository: %s/%s/%s", host, owner, repo)
 
+	// TODO: get log
 	cmd.Start()
 }
