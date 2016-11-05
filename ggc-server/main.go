@@ -92,6 +92,10 @@ func gitClone(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Repository: %s/%s/%s", host, owner, repo)
 
-	// TODO: get log
-	cmd.Start()
+	go func() {
+		err := cmd.Run()
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 }
