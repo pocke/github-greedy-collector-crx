@@ -79,6 +79,7 @@ func gitClone(w http.ResponseWriter, r *http.Request) {
 	host := r.FormValue("host")
 	owner := r.FormValue("owner")
 	repo := r.FormValue("repo")
+	lang := r.FormValue("lang")
 
 	if host == "" || owner == "" || repo == "" {
 		w.WriteHeader(400)
@@ -86,11 +87,18 @@ func gitClone(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := fmt.Sprintf("git@%s:%s/%s", host, owner, repo)
-	reposPath := filepath.Join(ggcDir, host, owner, repo)
-	cmd := exec.Command("git", "clone", url, reposPath)
+	url := fmt.Sprintf("https://%s/%s/%s", host, owner, repo)
+	cmdArgs := []string{}
+	if lang == "Go" {
+		cmdArgs = []string{"go", "-d", url}
+	} else {
+		cmdArgs = []string{"ghq", url}
+	}
+
+	cmd := exec.Command("get", cmdArgs...)
 
 	log.Printf("Repository: %s/%s/%s", host, owner, repo)
+	log.Printf("Cmd: %s", strings.Join(cmd.Args, " "))
 
 	go func() {
 		err := cmd.Run()
